@@ -8,7 +8,7 @@ function App() {
   const [duration, setDuration] = useState("");
 
   const getPlans = async () => {
-    const res = await fetch("http://localhost:5000/plans");
+    const res = await fetch("https://smart-learning-planner-backend.vercel.app/plans");
     const data = await res.json();
     setPlans(data);
   };
@@ -18,29 +18,41 @@ function App() {
   }, []);
 
   const addPlan = async () => {
-    await fetch("http://localhost:5000/plans", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title, description, duration }),
-    });
+    if (!title || !description || !duration) {
+      alert("Please fill all fields");
+      return;
+    }
 
-    setTitle("");
-    setDescription("");
-    setDuration("");
-    getPlans();
+    try {
+      const res = await fetch("https://smart-learning-planner-backend.vercel.app/plans", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title, description, duration }),
+      });
+
+      if (!res.ok) throw new Error("Failed to add plan");
+
+      setTitle("");
+      setDescription("");
+      setDuration("");
+      getPlans();
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error adding plan");
+    }
   };
 
   const deletePlan = async (id) => {
-    await fetch(`http://localhost:5000/plans/${id}`, {
+    await fetch(`https://smart-learning-planner-backend.vercel.app/plans/${id}`, {
       method: "DELETE",
     });
     getPlans();
   };
 
   const togglePlan = async (id) => {
-    await fetch(`http://localhost:5000/plans/${id}`, {
+    await fetch(`https://smart-learning-planner-backend.vercel.app/plans/${id}`, {
       method: "PUT",
     });
     getPlans();
